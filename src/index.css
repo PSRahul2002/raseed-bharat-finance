@@ -2,41 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Raseed Design System - Google Wallet Inspired
+Material Design 3 principles with Indian finance context
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Soft, Google Wallet inspired background */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
+    /* Clean card system with subtle elevation */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Google-style primary blue with warmth */
+    --primary: 213 94% 68%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 213 94% 58%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Soft secondary with subtle warmth */
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 215 25% 15%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Gentle muted tones */
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Soft accent for highlights */
+    --accent: 142 76% 85%;
+    --accent-foreground: 142 76% 25%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Gentle error states */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Success for financial gains */
+    --success: 142 76% 55%;
+    --success-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    /* Warning for budget alerts */
+    --warning: 45 93% 65%;
+    --warning-foreground: 45 93% 15%;
+
+    /* Subtle borders and inputs */
+    --border: 210 20% 90%;
+    --input: 210 20% 95%;
+    --ring: 213 94% 68%;
+
+    /* Generous border radius for Google Wallet feel */
+    --radius: 0.75rem;
+
+    /* Financial data colors */
+    --income: 142 76% 55%;
+    --expense: 0 84% 60%;
+    --transfer: 213 94% 68%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68%), hsl(213 94% 78%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 55%), hsl(142 76% 65%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 20% 98%));
+
+    /* Shadows for depth */
+    --shadow-soft: 0 2px 8px -2px hsl(215 25% 15% / 0.08);
+    --shadow-medium: 0 4px 16px -4px hsl(215 25% 15% / 0.12);
+    --shadow-strong: 0 8px 32px -8px hsl(215 25% 15% / 0.16);
+
+    /* Animation curves */
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +138,53 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer components {
+  /* Raseed UI Components */
+  .raseed-card {
+    @apply bg-card rounded-xl border border-border shadow-[var(--shadow-soft)] transition-all duration-300;
+  }
+
+  .raseed-card-hover {
+    @apply raseed-card hover:shadow-[var(--shadow-medium)] hover:-translate-y-1;
+  }
+
+  .raseed-button-primary {
+    @apply bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))] rounded-xl px-6 py-3 font-medium transition-all duration-200 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-medium)];
+  }
+
+  .raseed-button-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-muted rounded-xl px-6 py-3 font-medium transition-all duration-200;
+  }
+
+  .raseed-input {
+    @apply bg-input border border-border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200;
+  }
+
+  .raseed-balance-card {
+    @apply raseed-card bg-gradient-to-br from-white to-background p-6;
+  }
+
+  .raseed-expense-positive {
+    @apply text-[hsl(var(--income))] font-medium;
+  }
+
+  .raseed-expense-negative {
+    @apply text-[hsl(var(--expense))] font-medium;
+  }
+
+  .raseed-gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .raseed-gradient-success {
+    background: var(--gradient-success);
+  }
+
+  .raseed-text-currency {
+    @apply font-mono font-semibold tracking-tight;
   }
 }
