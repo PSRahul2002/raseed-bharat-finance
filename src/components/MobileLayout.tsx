@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, 
   TrendingUp, 
-  PiggyBank, 
+  Receipt, 
   Plus, 
   Bot,
   Settings,
@@ -17,9 +17,9 @@ interface MobileLayoutProps {
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Insights', href: '/insights', icon: TrendingUp },
+  { name: 'Bills', href: '/bills', icon: Receipt },
   { name: 'Add', href: '/add', icon: Plus },
   { name: 'Assistant', href: '/assistant', icon: Bot },
-  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 const MobileLayout: React.FC<MobileLayoutProps> = ({ children }) => {

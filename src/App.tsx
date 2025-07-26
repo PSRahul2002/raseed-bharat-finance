@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Insights from "./pages/Insights";
 import Budgets from "./pages/Budgets";
+import Bills from "./pages/Bills";
 import AddExpense from "./pages/AddExpense";
 import Assistant from "./pages/Assistant";
 import Notifications from "./pages/Notifications";
@@ -31,6 +32,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/budgets" element={<Budgets />} />
+        <Route path="/bills" element={<Bills />} />
         <Route path="/add" element={<AddExpense />} />
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/notifications" element={<Notifications />} />
