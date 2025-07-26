@@ -1,0 +1,23 @@
+# Minimal requirements for development and testing
+# Use this if you have disk space issues
+
+# Core FastAPI dependencies (lightweight)
+fastapi>=0.110.0
+uvicorn>=0.27.0
+pydantic>=2.6.0
+
+# Essential Google dependencies only
+google-generativeai>=0.4.0
+google-cloud-firestore>=2.14.0
+google-auth>=2.27.0
+
+# Core utilities
+requests>=2.31.0
+python-multipart>=0.0.7
+python-dotenv>=1.0.0
+
+# Basic image processing
+Pillow>=10.2.0
+
+# JWT for wallet passes
+PyJWT>=2.8.0
