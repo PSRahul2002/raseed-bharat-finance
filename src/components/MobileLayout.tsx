@@ -5,6 +5,7 @@ import {
   TrendingUp, 
   PiggyBank, 
   Plus, 
+  Bot,
   Settings,
   Wallet
 } from 'lucide-react';
@@ -17,7 +18,7 @@ const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Insights', href: '/insights', icon: TrendingUp },
   { name: 'Add', href: '/add', icon: Plus },
-  { name: 'Budgets', href: '/budgets', icon: PiggyBank },
+  { name: 'Assistant', href: '/assistant', icon: Bot },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

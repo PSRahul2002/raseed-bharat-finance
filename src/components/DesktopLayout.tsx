@@ -5,6 +5,7 @@ import {
   TrendingUp, 
   PiggyBank, 
   Plus, 
+  Bot,
   Bell, 
   Settings,
   LogOut,
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Insights', href: '/insights', icon: TrendingUp },
   { name: 'Budgets', href: '/budgets', icon: PiggyBank },
   { name: 'Add Expense', href: '/add', icon: Plus },
+  { name: 'Assistant', href: '/assistant', icon: Bot },
   { name: 'Notifications', href: '/notifications', icon: Bell },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
