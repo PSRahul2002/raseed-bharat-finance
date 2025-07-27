@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Query WebSocket Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        
+        .connection-status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .messages {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f8f9fa;
+            margin-top: 20px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        
+        .message.status {
+            background-color: #cce5ff;
+            border-left: 4px solid #007bff;
+        }
+        
+        .message.result {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .message.error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .message.intermediate {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .timestamp {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .examples {
+            margin-top: 20px;
+        }
+        
+        .example-query {
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .example-query:hover {
+            background-color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Expense Query WebSocket Client</h1>
+        
+        <div id="connectionStatus" class="connection-status disconnected">
+            Disconnected
+        </div>
+        
+        <div class="input-group">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" value="user123" placeholder="Enter your user ID">
+        </div>
+        
+        <div class="input-group">
+            <label for="serverUrl">WebSocket Server URL:</label>
+            <input type="text" id="serverUrl" value="wss://expense-query-websocket-api-acjxr5nrwa-uc.a.run.app/ws" placeholder="WebSocket URL">
+        </div>
+        
+        <button id="connectBtn" onclick="connect()">Connect</button>
+        <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+        
+        <div class="input-group">
+            <label for="queryInput">Your Query:</label>
+            <input type="text" id="queryInput" placeholder="Ask about your expenses..." onkeypress="handleKeyPress(event)">
+            <button id="sendBtn" onclick="sendQuery()" disabled>Send Query</button>
+        </div>
+        
+        <div class="examples">
+            <h3>Example Queries:</h3>
+            <div class="example-query" onclick="setQuery('Show me all my grocery expenses')">Show me all my grocery expenses</div>
+            <div class="example-query" onclick="setQuery('What did I spend on food last month?')">What did I spend on food last month?</div>
+            <div class="example-query" onclick="setQuery('How much did I spend at Amazon?')">How much did I spend at Amazon?</div>
+            <div class="example-query" onclick="setQuery('Show me my highest expenses')">Show me my highest expenses</div>
+            <div class="example-query" onclick="setQuery('What are my total expenses?')">What are my total expenses?</div>
+        </div>
+        
+        <div class="messages" id="messages"></div>
+    </div>
+
+    <script>
+        let socket = null;
+        let isConnected = false;
+
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            isConnected = connected;
+            
+            if (connected) {
+                statusElement.textContent = 'Connected';
+                statusElement.className = 'connection-status connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                sendBtn.disabled = false;
+            } else {
+                statusElement.textContent = 'Disconnected';
+                statusElement.className = 'connection-status disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendBtn.disabled = true;
+            }
+        }
+
+        function addMessage(type, content, timestamp) {
+            const messagesContainer = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const timestampStr = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+            
+            messageDiv.innerHTML = `
+                <div>${content}</div>
+                <div class="timestamp">${timestampStr}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function connect() {
+            const userId = document.getElementById('userId').value.trim();
+            const serverUrl = document.getElementById('serverUrl').value.trim();
+            
+            if (!userId) {
+                alert('Please enter a User ID');
+                return;
+            }
+            
+            try {
+                const wsUrl = userId ? `${serverUrl}/${userId}` : serverUrl;
+                socket = new WebSocket(wsUrl);
+                
+                socket.onopen = function(event) {
+                    updateConnectionStatus(true);
+                    addMessage('status', '🟢 Connected to server', null);
+                };
+                
+                socket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    
+                    switch(data.type) {
+                        case 'connection':
+                            addMessage('status', data.message, data.timestamp);
+                            break;
+                        case 'status':
+                            addMessage('status', `⏳ ${data.message}`, data.timestamp);
+                            break;
+                        case 'intermediate':
+                            addMessage('intermediate', `📊 Found ${data.results_count} matching receipts`, data.timestamp);
+                            break;
+                        case 'result':
+                            addMessage('result', `✅ ${data.answer}`, data.timestamp);
+                            break;
+                        case 'error':
+                            addMessage('error', `❌ Error: ${data.error}`, data.timestamp);
+                            break;
+                        case 'pong':
+                            addMessage('status', '🏓 Pong received', data.timestamp);
+                            break;
+                        default:
+                            addMessage('status', JSON.stringify(data), data.timestamp);
+                    }
+                };
+                
+                socket.onclose = function(event) {
+                    updateConnectionStatus(false);
+                    addMessage('status', '🔴 Disconnected from server', null);
+                };
+                
+                socket.onerror = function(error) {
+                    addMessage('error', `❌ Connection error: ${error}`, null);
+                };
+                
+            } catch (error) {
+                addMessage('error', `❌ Failed to connect: ${error}`, null);
+            }
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.close();
+                socket = null;
+                updateConnectionStatus(false);
+            }
+        }
+
+        function sendQuery() {
+            const query = document.getElementById('queryInput').value.trim();
+            
+            if (!query) {
+                alert('Please enter a query');
+                return;
+            }
+            
+            if (!isConnected || !socket) {
+                alert('Please connect to the server first');
+                return;
+            }
+            
+            const message = {
+                type: 'query',
+                query: query
+            };
+            
+            socket.send(JSON.stringify(message));
+            addMessage('status', `📤 Sent query: "${query}"`, null);
+            document.getElementById('queryInput').value = '';
+        }
+
+        function setQuery(query) {
+            document.getElementById('queryInput').value = query;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendQuery();
+            }
+        }
+
+        function sendPing() {
+            if (isConnected && socket) {
+                socket.send(JSON.stringify({type: 'ping'}));
+                addMessage('status', '🏓 Ping sent', null);
+            }
+        }
+
+        // Initialize the interface
+        updateConnectionStatus(false);
+    </script>
+</body>
+</html>

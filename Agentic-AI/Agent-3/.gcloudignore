@@ -1,0 +1,47 @@
+# Ignore files for Google Cloud Build
+.git
+.gitignore
+README.md
+*.md
+.env
+.env.*
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Development files
+websocket_client.html
+test_websocket.py
+start.sh
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Documentation
+docs/
+
+# Large files that might cause issues
+*.tar.gz
+*.zip

@@ -1,0 +1,75 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 
+      'gcr.io/$PROJECT_ID/expense-query-websocket-api:v1',
+      '-t',
+      'gcr.io/$PROJECT_ID/expense-query-websocket-api:latest',
+      '.'
+    ]
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push', 
+      'gcr.io/$PROJECT_ID/expense-query-websocket-api:v1'
+    ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push', 
+      'gcr.io/$PROJECT_ID/expense-query-websocket-api:latest'
+    ]
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [
+      'run',
+      'deploy',
+      'expense-query-websocket-api',
+      '--image',
+      'gcr.io/$PROJECT_ID/expense-query-websocket-api:v1',
+      '--region',
+      'us-central1',
+      '--platform',
+      'managed',
+      '--allow-unauthenticated',
+      '--port',
+      '8000',
+      '--memory',
+      '2Gi',
+      '--cpu',
+      '2',
+      '--max-instances',
+      '10',
+      '--timeout',
+      '3600',
+      '--concurrency',
+      '80',
+      '--set-env-vars',
+      'GOOGLE_PROJECT_ID=$PROJECT_ID',
+      '--set-env-vars',
+      'GOOGLE_API_KEY=${_GOOGLE_API_KEY}',
+      '--set-env-vars',
+      'GOOGLE_SERVICE_ACCOUNT_PATH=/app/service_account.json',
+      '--set-env-vars',
+      'DATABASE_NAME=${_DATABASE_NAME}',
+      '--set-env-vars',
+      'COLLECTION_NAME=${_COLLECTION_NAME}'
+    ]
+
+images:
+  - 'gcr.io/$PROJECT_ID/expense-query-websocket-api:v1'
+  - 'gcr.io/$PROJECT_ID/expense-query-websocket-api:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+substitutions:
+  _GOOGLE_API_KEY: 'your-google-api-key'
+  _DATABASE_NAME: 'receipts'
+  _COLLECTION_NAME: 'receipts'
